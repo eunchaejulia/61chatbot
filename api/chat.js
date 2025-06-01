@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
 AI:
   `;
 
-  const response = await fetch("https://api-inference.huggingface.co/models/tiiuae/falcon-rw-1b", {
+  const response = await fetch("https://api-inference.huggingface.co/models/bigscience/bloomz-560m", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${process.env.HF_API_KEY}`,
