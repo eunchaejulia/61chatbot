@@ -14,31 +14,36 @@ module.exports = async (req, res) => {
 AI:
   `;
 
-  const response = await fetch("https://api-inference.huggingface.co/models/bigscience/bloomz-560m", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.HF_API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      inputs: prompt,
-      parameters: {
-        max_new_tokens: 100,
-        temperature: 0.8
-      }
-    })
-  });
+  try {
+    const response = await fetch("https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.HF_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 100,
+          temperature: 0.8
+        }
+      })
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("HF API 오류:", errorText);
-    return res.status(500).json({ reply: "챗봇 로딩 실패노" });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("HF API 오류:", errorText);
+      return res.status(500).json({ reply: "챗봇 로딩 실패노" });
+    }
+
+    const data = await response.json();
+    const reply = Array.isArray(data)
+      ? data[0]?.generated_text?.split("AI:")[1]?.trim() || "응답 실패노"
+      : data.generated_text || "응답 실패노";
+
+    res.status(200).json({ reply });
+  } catch (err) {
+    console.error("예외 발생:", err);
+    res.status(500).json({ reply: "API 호출 중 예외 발생노" });
   }
-
-  const data = await response.json();
-  const reply = Array.isArray(data)
-    ? data[0]?.generated_text?.split("AI:")[1]?.trim() || "응답 실패노"
-    : data.generated_text || "응답 실패노";
-
-  res.status(200).json({ reply });
 };
