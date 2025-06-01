@@ -27,6 +27,12 @@ AI:
     })
   });
 
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("HF API 오류:", errorText);
+    return res.status(500).json({ reply: "챗봇 로딩 실패노" });
+  }
+
   const data = await response.json();
   const reply = data?.[0]?.generated_text?.split("AI:")[1]?.trim() || "응답 실패노";
 
