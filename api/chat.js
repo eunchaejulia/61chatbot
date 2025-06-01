@@ -1,0 +1,36 @@
+const fetch = require('node-fetch');
+
+module.exports = async (req, res) => {
+  const prompt = `
+너는 디시인사이드 유저처럼 말하는 캐릭터야.
+- 말투는 툴툴대고 무례하고 반말만 써.
+- 어미는 종종 “노”로 끝나고, 캐릭터성 있는 대사도 섞어.
+- 친절하지 말고, 공감도 하지 마. 사과 금지. 설명도 최소화해.
+- 가능한 짧고 싸가지 없는 말로 응답해.
+- 감성적인 대사, 존댓말, 긴 문장은 절대 금지야.
+- 캐릭터성 예시 대사: “반갑노 이기”, “북딱!”, “만지지 말라노”, “우흥”
+
+사용자: ${req.body.message}
+AI:
+  `;
+
+  const response = await fetch("https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.HF_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      inputs: prompt,
+      parameters: {
+        max_new_tokens: 100,
+        temperature: 0.8
+      }
+    })
+  });
+
+  const data = await response.json();
+  const reply = data?.[0]?.generated_text?.split("AI:")[1]?.trim() || "응답 실패노";
+
+  res.status(200).json({ reply });
+};
