@@ -2,13 +2,17 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>노알라 GPT</title>
+  <title>노알라 GPT 채팅</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="character" onclick="speakRandomLine()">
-    <img src="norala.png" alt="노알라">
-    <div id="speech-bubble">뭐하노</div>
+  <div class="chat-wrapper">
+    <h1>노알라 GPT</h1>
+    <div class="chat-container" id="chat-container"></div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="할 말 있노?" onkeydown="if(event.key==='Enter') sendMessage()"/>
+      <button onclick="sendMessage()">입력</button>
+    </div>
   </div>
   <script src="script.js"></script>
 </body>

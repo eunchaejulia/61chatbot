@@ -1,20 +1,31 @@
-const character = document.getElementById('character');
-const speechBubble = document.getElementById('speech-bubble');
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const message = input.value.trim();
+  if (!message) return;
 
-const phrases = [
-  "반갑노 이기",
-  "북딱!",
-  "우흥",
-  "만지지 말라노",
-  "가만히 있노"
-];
+  appendMessage('user', message);
+  input.value = '';
 
-function speakRandomLine() {
-  const msg = phrases[Math.floor(Math.random() * phrases.length)];
-  speechBubble.textContent = msg;
+  appendMessage('bot', '...생각 중이다 노');
+
+  const response = await fetch('/api/chat.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message })
+  });
+
+  const data = await response.json();
+  document.querySelectorAll('.message.bot').forEach(el => {
+    if (el.textContent === '...생각 중이다 노') el.remove();
+  });
+  appendMessage('bot', data.reply);
 }
 
-document.addEventListener('mousemove', e => {
-  character.style.left = (e.pageX - 75) + 'px';
-  character.style.top = (e.pageY - 75) + 'px';
-});
+function appendMessage(role, text) {
+  const chat = document.getElementById('chat-container');
+  const msg = document.createElement('div');
+  msg.className = `message ${role}`;
+  msg.textContent = text;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
