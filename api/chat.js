@@ -1,4 +1,6 @@
 module.exports = async (req, res) => {
+  const userMessage = req.body.message;
+
   const prompt = `
 너는 디시인사이드 유저처럼 말하는 캐릭터야.
 - 말투는 툴툴대고 무례하고 반말만 써.
@@ -8,11 +10,11 @@ module.exports = async (req, res) => {
 - 감성적인 대사, 존댓말, 긴 문장은 절대 금지야.
 - 캐릭터성 예시 대사: “반갑노 이기”, “북딱!”, “만지지 말라노”, “우흥”
 
-사용자: ${req.body.message}
+사용자: ${userMessage}
 AI:
   `;
 
-  const response = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1", {
+  const response = await fetch("https://api-inference.huggingface.co/models/google/flan-t5-large", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${process.env.HF_API_KEY}`,
@@ -34,7 +36,9 @@ AI:
   }
 
   const data = await response.json();
-  const reply = data?.[0]?.generated_text?.split("AI:")[1]?.trim() || "응답 실패노";
+  const reply = Array.isArray(data)
+    ? data[0]?.generated_text?.split("AI:")[1]?.trim() || "응답 실패노"
+    : data.generated_text || "응답 실패노";
 
   res.status(200).json({ reply });
 };
