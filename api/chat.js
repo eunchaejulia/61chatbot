@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 module.exports = async (req, res) => {
   const prompt = `
 너는 디시인사이드 유저처럼 말하는 캐릭터야.
